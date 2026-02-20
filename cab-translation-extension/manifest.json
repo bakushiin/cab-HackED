@@ -37,8 +37,8 @@
   "commands": {
     "analyze-selection-or-sentence": {
       "suggested_key": {
-        "default": "Ctrl+Shift+Y",
-        "mac": "Command+Shift+Y"
+        "default": "Ctrl+Shift",
+        "mac": "Command+Shift"
       },
       "description": "Analyze current selection or detected sentence"
     }
