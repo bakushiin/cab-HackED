@@ -30,11 +30,36 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         console.error(error);
         sendResponse({ translatedText: null });
       });
+    
+    
 
-    return true; // IMPORTANT: keeps service worker alive for async
+    return true;
+  }
+
+  if (message.action === "addFlashcard") {
+    addFlashcard(message.original, message.translation)
+      .then(() => sendResponse({ success: true }))
+      .catch(error => {
+        console.error(error);
+        sendResponse({ success: false });
+      });
+
+    return true;
   }
 
 });
+
+async function addFlashcard(original, translation) {
+  const newCard = {
+    id: original,
+    translation
+  }
+
+  const data = await chrome.storage.local.get({flashcards: []});
+
+  const updatedFlashcards = [...data.flashcards, newCard];
+  await chrome.storage.local.set({flashcards: updatedFlashcards});
+}
 
 // Default init conditions on install
 chrome.runtime.onInstalled.addListener(async () => {
