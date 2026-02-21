@@ -237,3 +237,64 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // Keep message channel open for async sendResponse
   return true;
 });
+
+const DEEPL_KEY = "433a6554-ee2e-447e-abc5-a67011a18cb3:fx";        // WE WILL NEED TO REMOVE THIS probably
+
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.contextMenus.create({
+    id: "cabTranslate",
+    title: "DeepL translate",
+    contexts: ["selection"]
+  });
+});
+
+// Using a context menu, will change later probably
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+  if (info.menuItemId !== "cabTranslate") return;
+
+  const selectedText = info.selectionText;
+
+  if (!selectedText) return;
+
+  try {
+    const response = await fetch("https://api-free.deepl.com/v2/translate", {
+      method: "POST",
+      headers: {
+        "Authorization": `DeepL-Auth-Key ${DEEPL_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        text: [selectedText],
+        target_lang: "EN"                   // CHANGE TO DO A ANY LANG
+      })
+    });
+
+    const data = await response.json();
+    const translated = data.translations[0].text;
+
+    chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      func: (translatedText) => {
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return;
+
+        const range = selection.getRangeAt(0);
+
+        // Create a the translated text element to insert
+        const translation = document.createDocumentFragment();
+        translation.appendChild(document.createElement("br"));
+        translation.appendChild(document.createTextNode(translatedText));
+        translation.appendChild(document.createElement("br"));
+
+        range.collapse();
+        range.insertNode(translation);
+
+        selection.removeAllRanges();
+      },
+      args: [translated]
+    });
+
+  } catch (error) {
+    console.error(error);
+  }
+});
