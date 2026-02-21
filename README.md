@@ -2,7 +2,7 @@
 
 # Chrome Extension: CAB Translation Extension
 
-This Chrome extension allows users to translate other language text to English. The functionality includes:
+This Chrome extension is a learning tool that allows users to translate other language text to English. The functionality includes:
 
 ### **Translation Functionality**
 - **Highlight text** → Shows a dialog box on highlight to **translate** selected text.
