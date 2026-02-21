@@ -1,4 +1,4 @@
-const cardBtn = getElementById('card-btn')
+const cardBtn = document.getElementById('card-btn');
 
 async function loadFlashcards() {
   const { flashcards } = await chrome.storage.local.get({ flashcards: [] });
@@ -18,3 +18,5 @@ async function loadFlashcards() {
     container.appendChild(div);
   });
 }
+
+cardBtn.addEventListener('click', () => {loadFlashcards()});
