@@ -1,55 +1,10 @@
-/* Responsibilities:
-	•	read window.getSelection()
-	•	send selected text back to background.js
-	•	later: YouTube subtitle fallback if no selection exists
-*/
-/*
-  Content script for page translate/revert state.
-*/
+/* Highlight-selection translation content script. */
 
-let isTranslated = false;
-const originalTextByNode = new Map();
 let selectionPopup = null;
 let selectedRange = null;
 let selectionUpdateTimer = null;
 let selectionTranslationEnabled = true;
 const FALLBACK_PREFIX = "[Translated] ";
-
-function isUsefulText(text) {
-  const trimmed = text.trim();
-  return trimmed.length > 1 && /[A-Za-z]/.test(trimmed);
-}
-
-function getTranslatableNodes() {
-  const nodes = [];
-  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
-    acceptNode(node) {
-      if (!node?.nodeValue || !isUsefulText(node.nodeValue)) {
-        return NodeFilter.FILTER_REJECT;
-      }
-
-      const parent = node.parentElement;
-      if (!parent) {
-        return NodeFilter.FILTER_REJECT;
-      }
-
-      const tag = parent.tagName;
-      if (["SCRIPT", "STYLE", "NOSCRIPT", "TEXTAREA", "INPUT"].includes(tag)) {
-        return NodeFilter.FILTER_REJECT;
-      }
-
-      return NodeFilter.FILTER_ACCEPT;
-    },
-  });
-
-  let current = walker.nextNode();
-  while (current) {
-    nodes.push(current);
-    current = walker.nextNode();
-  }
-
-  return nodes;
-}
 
 function sendToBackground(message) {
   return new Promise((resolve) => {
@@ -238,42 +193,6 @@ function scheduleSelectionPopupUpdate() {
   }, 0);
 }
 
-async function translatePage() {
-  const nodes = getTranslatableNodes();
-  if (!nodes.length) {
-    return;
-  }
-
-  const texts = nodes.map((node) => node.nodeValue || "");
-  const response = await sendToBackground({ action: "translateBatch", texts });
-  const translatedTexts = Array.isArray(response?.translatedTexts) ? response.translatedTexts : [];
-  const useFallback = translatedTexts.length !== texts.length;
-
-  nodes.forEach((node, index) => {
-    if (!originalTextByNode.has(node)) {
-      originalTextByNode.set(node, node.nodeValue || "");
-    }
-
-    const translated = useFallback ? fallbackTranslateText(texts[index]) : translatedTexts[index];
-    if (typeof translated === "string" && translated.trim()) {
-      node.nodeValue = translated;
-    }
-  });
-
-  isTranslated = true;
-}
-
-function revertPage() {
-  originalTextByNode.forEach((originalText, node) => {
-    if (node && node.isConnected) {
-      node.nodeValue = originalText;
-    }
-  });
-
-  originalTextByNode.clear();
-  isTranslated = false;
-}
-
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message?.action === "getSelectionTranslationState") {
     sendResponse({ enabled: selectionTranslationEnabled });
@@ -289,29 +208,11 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return;
   }
 
-  if (message?.action === "getTranslationState") {
-    sendResponse({ translated: isTranslated });
-    return;
-  }
-
   if (message?.action === "translateCurrentSelectionNow") {
     (async () => {
       const ok = await translateSelectionImmediately();
       sendResponse({ ok });
     })();
-    return true;
-  }
-
-  if (message?.action === "togglePageTranslation") {
-    (async () => {
-      if (isTranslated) {
-        revertPage();
-      } else {
-        await translatePage();
-      }
-      sendResponse({ translated: isTranslated });
-    })();
-
     return true;
   }
 });
