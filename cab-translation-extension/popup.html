@@ -29,6 +29,14 @@
       margin-top: 8px;
     }
 
+    button:hover {
+      translate: -2px;
+    }
+
+    button:active{
+      scale: 98%;
+    }
+
     .translate {
       background: #40531B;
       color: #ffffff;
@@ -52,6 +60,20 @@
       background: #618B4A;
       color: #ffffff;
     }
+
+    #dash-btn {
+      background-color: rgb(20, 20, 20);
+      color: white;
+      width: 100%;
+      border: 0;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    
   </style>
 </head>
 <body>
@@ -60,6 +82,7 @@
   <button id="openPanelBtn" class="btn panel" type="button">Open Side Panel</button>
   <button id="ThirdBtn" class="btn third" type="button">Button</button>
   <button id="FourthBtn" class="btn fourth" type="button">Button</button>
+  <button id="dash-btn" class="dash-btn" type="button">Dashboard</button>
 
   <script src="popup.js"></script>
 </body>

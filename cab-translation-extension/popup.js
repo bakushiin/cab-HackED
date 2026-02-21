@@ -2,6 +2,7 @@ const translateBtn = document.getElementById("translateBtn");
 const openPanelBtn = document.getElementById("openPanelBtn");
 const quickThirdBtn = document.getElementById("openThirdBtn");
 const openFourthBtn = document.getElementById("openFourthBtn");
+const dashBtn = document.getElementById("dash-btn");
 const statusText = document.getElementById("status");
 
 function setTranslationMode(isEnabled) {
@@ -84,7 +85,15 @@ openPanelBtn.addEventListener("click", async () => {
   }
 });
 
-openThirdBtn.addEventListener("click", () => {});
-openFourthBtn.addEventListener("click", () => {});
+// quickThirdBtn.addEventListener("click", () => {return});
+// openFourthBtn.addEventListener("click", () => {return});
+dashBtn.addEventListener('click', () => {
+  chrome.windows.create({
+    url: chrome.runtime.getURL('dashboard/dashboard.html'),
+    type:'popup',
+    width: 1100,
+    height: 800
+  })
+});
 
 refreshState();
