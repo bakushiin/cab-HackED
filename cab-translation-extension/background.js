@@ -282,21 +282,33 @@ function insertTranslation(tabId, translatedText) {
 
       const range = selection.getRangeAt(0);
 
+      const wrapper = document.createElement('span');
+      wrapper.classname = 'cab-translation-wrapper';
+      wrapper.appendChild(document.createElement('br'));
+
       const span = document.createElement('span');
       span.textContent = text;
+      span.className = 'cab-translation-text';
 
-      span.style.backgroundColor = '#ffefc5';
-      span.style.fontStyle = 'italic';
-      span.style.fontSize = '0.9em';
-      span.style.padding = '0.25em';
+      const undoBtn = document.createElement('button');
+      undoBtn.className = 'cab-undo-btn';
+      undoBtn.innerHTML = `
+          <svg width="14" height="14" viewBox="0 0 24 24">
+            <path fill="currentColor"
+              d="M12 5v4l-5-5 5-5v4c5 0 9 4 9 9a9 9 0 0 1-9 9v-2a7 7 0 0 0 0-14z"/>
+          </svg>
+        `;
+      undoBtn.title = 'undo translation';
 
-      const translatedSection = document.createDocumentFragment();
-      translatedSection.appendChild(document.createElement('br'));
-      translatedSection.appendChild(span);
-      translatedSection.appendChild(document.createElement('br'));
+      undoBtn.addEventListener('click', () => {
+        wrapper.remove();
+      });
+      wrapper.appendChild(span);
+      wrapper.appendChild(undoBtn);
+      wrapper.appendChild(document.createElement('br'));
 
       range.collapse(); 
-      range.insertNode(translatedSection);
+      range.insertNode(wrapper);
 
       selection.removeAllRanges();
     },
