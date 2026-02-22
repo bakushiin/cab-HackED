@@ -276,6 +276,31 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         break;
       }
 
+      case "OPEN_SIDE_PANEL": {
+        const tabId = sender.tab?.id;
+        const windowId = sender.tab?.windowId;
+
+        if (typeof tabId !== "number" || typeof windowId !== "number") {
+          sendResponse({ ok: false, error: "Invalid sender tab." });
+          break;
+        }
+
+        try {
+          await chrome.sidePanel.open({ windowId });
+        } catch (err) {
+          try {
+            await chrome.sidePanel.setOptions({ tabId, path: "sidepanel.html", enabled: true });
+            await chrome.sidePanel.open({ windowId });
+          } catch (err2) {
+            sendResponse({ ok: false, error: err2?.message || err?.message || "Failed to open side panel." });
+            break;
+          }
+        }
+
+        sendResponse({ ok: true });
+        break;
+      }
+
       case "GET_DEFINITION": {
         const { word, from, to } = message;
         try {

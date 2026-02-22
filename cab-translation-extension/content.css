@@ -37,8 +37,28 @@
 }
 
 .side-panel-button {
-  position: relative;
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  border: 0;
+  background: transparent;
+  padding: 4px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
 
+.side-panel-button:hover {
+  opacity: 1;
+}
+
+.side-panel-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  display: block;
 }
 
 .cab-translation-text {

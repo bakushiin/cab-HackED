@@ -107,15 +107,30 @@ function showPopup(translatedText) {
   document.addEventListener('mousedown', onClickOutside);
 
   const sidePanelIcon = document.createElement("button");
-  sidePanelIcon.innerHTML = '<img src="' + chrome.runtime.getURL("./cab.png") + '" alt="Panel" />';
-  sidePanelIcon.onclick = (e) => {
-    console.log("Button clicked!");
+  sidePanelIcon.type = "button";
+  sidePanelIcon.className = "side-panel-button";
+  sidePanelIcon.setAttribute("aria-label", "Open side panel");
+
+  const iconImg = document.createElement("img");
+  iconImg.className = "side-panel-icon";
+  iconImg.src = chrome.runtime.getURL("cab.png");
+  iconImg.alt = "";
+  sidePanelIcon.appendChild(iconImg);
+
+  sidePanelIcon.addEventListener("mousedown", (e) => {
+    e.preventDefault();
     e.stopPropagation();
-    alert("Side panel opened!");
-  }
+    chrome.runtime.sendMessage({ type: "OPEN_SIDE_PANEL" }, (response) => {
+      if (chrome.runtime.lastError) {
+        console.error("OPEN_SIDE_PANEL runtime error:", chrome.runtime.lastError.message);
+        return;
+      }
+      if (!response?.ok) {
+        console.error("OPEN_SIDE_PANEL failed:", response?.error || "Unknown error");
+      }
+    });
+  });
   popup.appendChild(sidePanelIcon);
-  
-  
 }
 
 function hideSelectionPopup() {
