@@ -126,6 +126,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Default page state
-  showView("flashcards");
-  loadFlashcards().catch(console.error);
+  showView("history");
+  loadHistory().catch(console.error);
 });
