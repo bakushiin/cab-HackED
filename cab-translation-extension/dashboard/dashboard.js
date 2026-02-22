@@ -1,22 +1,52 @@
-const cardBtn = document.getElementById('card-btn');
+document.addEventListener("DOMContentLoaded", () => {
+  const cardBtn = document.getElementById("card-btn");
+  const historyBtn = document.getElementById("history-btn");
 
-async function loadFlashcards() {
-  const { flashcards } = await chrome.storage.local.get({ flashcards: [] });
+  const flashcardsView = document.getElementById("flashcards-view");
+  const historyView = document.getElementById("history-view");
 
-  const container = document.getElementById("cards");
-  container.innerHTML = "";
+  async function loadFlashcards() {
+    const { flashcards } = await chrome.storage.local.get({ flashcards: [] });
 
-  flashcards.forEach(card => {
-    const div = document.createElement("div");
-    div.className = "flashcard";
+    const container = document.getElementById("cards");
+    if (!container) return;
 
-    div.innerHTML = `
-      <div class="front">${card.original}</div>
-      <div class="back">${card.translation}</div>
-    `;
+    container.innerHTML = "";
 
-    container.appendChild(div);
+    if (!flashcards.length) {
+      container.innerHTML = "<p>No flashcards yet.</p>";
+      return;
+    }
+
+    flashcards.forEach((card) => {
+      const div = document.createElement("div");
+      div.className = "flashcard";
+
+      div.innerHTML = `
+        <div class="front">${card.original ?? ""}</div>
+        <div class="back">${card.translation ?? ""}</div>
+      `;
+
+      container.appendChild(div);
+    });
+  }
+
+  function showView(viewName) {
+    const showFlashcards = viewName === "flashcards";
+    flashcardsView.hidden = !showFlashcards;
+    historyView.hidden = showFlashcards;
+  }
+
+  cardBtn?.addEventListener("click", async () => {
+    showView("flashcards");
+    await loadFlashcards();
   });
-}
 
-cardBtn.addEventListener('click', () => {loadFlashcards()});
+  historyBtn?.addEventListener("click", () => {
+    showView("history");
+  });
+
+  // Default view on open
+  showView("flashcards");
+  loadFlashcards().catch(console.error);
+});
