@@ -1,21 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8" />
   <title>TaxiCab Dashboard</title>
   <link rel="stylesheet" href="dashboard.css">
-  <script src="dashboard.js"></script>
+  <script src="dashboard.js" defer></script>
 </head>
 <body>
-
   <nav>
     <h2>TaxiCab Dashboard</h2>
-    <button id="card-btn" data-view="flashcards">Flashcards</button>
-    <button id="history-btn" data-view="history">History</button>
+    <button id="card-btn" data-view="flashcards" type="button">Flashcards</button>
+    <button id="history-btn" data-view="history" type="button">History</button>
   </nav>
 
   <main>
-  </main>
+    <section id="flashcards-view">
+      <h3>Flashcards</h3>
+      <div id="cards"></div>
+    </section>
 
-  
+    <section id="history-view" hidden>
+      <h3>History</h3>
+      <div id="history-list">
+        <p>History UI coming next.</p>
+      </div>
+    </section>
+  </main>
 </body>
 </html>
