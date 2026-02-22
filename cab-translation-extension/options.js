@@ -3,21 +3,21 @@
 const STORAGE_KEY = "translatorOptions";
 
 const DEFAULT_OPTIONS = {
-  apiBaseUrl: "http://localhost:3000",
-  sourceLang: "auto",
+  // apiBaseUrl: "http://localhost:3000",
+  sourceLang: "EN",
   targetLang: "jp",
-  explanationStyle: "concise",
-  youtubeFallback: true,
-  debugMode: false
+  // explanationStyle: "concise",
+  // youtubeFallback: true,
+  // debugMode: false
 };
 
 // Form elements
-const apiBaseUrlInput = document.getElementById("apiBaseUrl");
+// const apiBaseUrlInput = document.getElementById("apiBaseUrl");
 const sourceLangSelect = document.getElementById("sourceLang");
 const targetLangSelect = document.getElementById("targetLang");
-const explanationStyleSelect = document.getElementById("explanationStyle");
-const youtubeFallbackCheckbox = document.getElementById("youtubeFallback");
-const debugModeCheckbox = document.getElementById("debugMode");
+// const explanationStyleSelect = document.getElementById("explanationStyle");
+// const youtubeFallbackCheckbox = document.getElementById("youtubeFallback");
+// const debugModeCheckbox = document.getElementById("debugMode");
 
 const saveBtn = document.getElementById("saveBtn");
 const resetBtn = document.getElementById("resetBtn");
@@ -49,7 +49,7 @@ function applyOptionsToForm(options) {
 
 function readOptionsFromForm() {
   return {
-    apiBaseUrl: apiBaseUrlInput.value.trim(),
+    // apiBaseUrl: apiBaseUrlInput.value.trim(),
     sourceLang: sourceLangSelect.value,
     targetLang: targetLangSelect.value,
     explanationStyle: explanationStyleSelect.value,
@@ -60,14 +60,14 @@ function readOptionsFromForm() {
 
 function validateOptions(options) {
   // API URL non-empty
-  if (!options.apiBaseUrl) {
-    return { ok: false, message: "API Base URL is required." };
-  }
+  // if (!options.apiBaseUrl) {
+  //   return { ok: false, message: "API Base URL is required." };
+  // }
 
-  // API URL starts with http:// or https://
-  if (!/^https?:\/\/.+/i.test(options.apiBaseUrl)) {
-    return { ok: false, message: "API Base URL must start with http:// or https://." };
-  }
+  // // API URL starts with http:// or https://
+  // if (!/^https?:\/\/.+/i.test(options.apiBaseUrl)) {
+  //   return { ok: false, message: "API Base URL must start with http:// or https://." };
+  // }
 
   // source/target cannot be identical if source is explicit (not auto)
   if (options.sourceLang !== "auto" && options.sourceLang === options.targetLang) {
@@ -131,14 +131,40 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   //  clear success/error styling when end user edits fields
   [
-    apiBaseUrlInput,
     sourceLangSelect,
     targetLangSelect,
-    explanationStyleSelect,
-    youtubeFallbackCheckbox,
-    debugModeCheckbox
+    // explanationStyleSelect,
+    // youtubeFallbackCheckbox,
+    // debugModeCheckbox
   ].forEach((el) => {
     el?.addEventListener("input", clearStatusToReady);
     el?.addEventListener("change", clearStatusToReady);
   });
+});
+
+const sourceDropdown = document.getElementById('source-dropdown');
+const targetDropdown = document.getElementById('target-dropdown');
+
+// Load saved language from Chrome storage
+chrome.storage.sync.get(['sourceLanguage'], (data) => {
+  if (data.sourceLanguage) {
+    sourceDropdown.value = data.sourceLanguage;
+  }
+});
+
+// Save selected language
+sourceDropdown.addEventListener('change', () => {
+  chrome.storage.sync.set({ sourceLanguage: sourceDropdown.value });
+});
+
+// Load saved language from Chrome storage
+chrome.storage.sync.get(['targetLanguage'], (data) => {
+  if (data.targetLanguage) {
+    targetDropdown.value = data.targetLanguage;
+  }
+});
+
+// Save selected language
+targetDropdown.addEventListener('change', () => {
+  chrome.storage.sync.set({ targetLanguage: targetDropdown.value });
 });
