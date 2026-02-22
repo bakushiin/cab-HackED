@@ -4,6 +4,9 @@ const definition = document.getElementById("definition");
 const statusText = document.getElementById("status");
 const translateTextBtn = document.getElementById("translateTextBtn");
 const definitionBtn = document.getElementById("definitionBtn");
+const explainBtn = document.getElementById("explainBtn");
+const sourceLangIn = document.getElementById("source");
+const targetLangIn = document.getElementById("target");
 
 function fallbackTranslate(text) {
   const clean = String(text || "").trim();
@@ -88,4 +91,22 @@ definitionBtn.addEventListener("click", async () => {
     });
 
     definition.innerHTML = html;
+});
+
+explainBtn.addEventListener('click', async () => {
+  const text = textInput.value.trim();
+  const targetLang = targetLangIn.value;
+  const sourceLang = sourceLangIn.value;
+  const result = await sendRuntimeMessage({
+    type: "GET_EXPLANATION",
+    text,
+    sourceLang: sourceLang,
+    targetLang: targetLang
+  });
+
+  if (!result) {
+    explain.value = "error";
+  } else {
+      explain.value = result;
+  }
 });

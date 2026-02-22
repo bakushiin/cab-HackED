@@ -22,6 +22,7 @@ const DEFAULT_OPTIONS = {
 const DEF_KEY = 'EhZY1LIjvO0gFNHY7QskYeedly4Ni9SNeFbytspOjNqoPAoxHOQQJQQJ99CBACBsN54XJ3w3AAAbACOGPo7x';
 const DEF_ENDPOINT = 'https://api.cognitive.microsofttranslator.com';
 const DEF_REGION = 'canadacentral';
+const EXPLAIN_KEY = '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';
 
 async function addFlashcard(original, translation) {
   const newCard = {
@@ -259,6 +260,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           .catch(error => {
             console.error(error);
             sendResponse({ translatedText: null });
+          });
+          break;
+      }
+
+      case "GET_EXPLANATION": {
+        getExplanation(message.text, message.sourceLang, message.targetLang)
+          .then(result => {
+            sendResponse(result);
+          })
+          .catch(error => {
+            console.error(error);
+            sendResponse({explanation: null});
           });
           break;
       }
@@ -516,4 +529,45 @@ async function detectLanguage(text) {
         console.error("detectLanguage error:", err);
         return 'en'; // fallback to English on error
     }
+}
+
+async function getExplanation(text, targetLang, sourceLang) {
+  const response = await fetch("https://api.openai.com/v1/responses", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${EXPLAIN_KEY}`,
+    },
+    body: JSON.stringify({
+      model: "gpt-5-nano",
+      instructions: `You are a multilingual language agent embedded in an extension.
+      When given a phrase or sentence in any language, you must:
+      1. Provide a clear grammar breakdown (tense, agreement, cases, structure).
+      2. Explain important vocabulary and expressions.
+      3. Explain nuance, tone, and usage.
+      Use clear section headers.
+      Be accurate and pedagogical.
+      Be concise.
+      A translation of the text is not needed nor is any followup comments`,
+      input: `Explain this ${sourceLang} phrase in ${targetLang}:\n\n"${text}"`,
+
+      reasoning: {effort: "low"},
+      text: {verbosity: "low"}
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`HTTP ${response.status}: ${errorText}`);
+  }
+
+  const data = await response.json();
+
+  console.log(data);
+
+  return data.output
+    ?.flatMap(item => item.content ?? [])
+    ?.filter(c => c.type === "output_text")
+    ?.map(c => c.text)
+    ?.join("\n") ?? "";
 }
