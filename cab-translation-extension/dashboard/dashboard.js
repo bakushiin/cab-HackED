@@ -27,6 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       const { flashcards = [] } = await chrome.storage.local.get({ flashcards: [] });
+      console.log(flashcards);
 
       cardsContainer.innerHTML = "";
 
@@ -44,9 +45,18 @@ document.addEventListener("DOMContentLoaded", () => {
         const translation = card.translation ?? card.translatedText ?? "";
 
         div.innerHTML = `
-          <div class="front"><strong>${escapeHtml(original)}</strong></div>
-          <div class="back">${escapeHtml(translation)}</div>
+        <div class="flashcard-inner">
+            <div class="flashcard-face flashcard-front">
+            <strong>${escapeHtml(original)}</strong>
+            </div>
+            <div class="flashcard-face flashcard-back">
+            ${escapeHtml(translation)}
+            </div>
+        </div>
         `;
+        div.addEventListener('click', () => {
+            div.classList.toggle('flipped');
+        });
 
         cardsContainer.appendChild(div);
       });

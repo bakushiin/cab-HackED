@@ -26,7 +26,8 @@ const EXPLAIN_KEY = 'sk-proj-LhKY2AmeJgtbny5-KnVCgCvy9qxeO4F1SEAQzyvtOT-casSeT5V
 
 async function addFlashcard(original, translation) {
   const newCard = {
-    id: original,
+    id: Date.now(), 
+    original,
     translation
   }
 
@@ -315,7 +316,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
 
       case "CREATE_FLASHCARD": {
-        addFlashcard(message.original, message.translation)
+        addFlashcard(message.word, message.translation)
           .then(() => sendResponse({ success: true }))
           .catch(error => {
             console.error(error);

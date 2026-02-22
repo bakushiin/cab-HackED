@@ -80,6 +80,17 @@ definitionBtn.addEventListener("click", async () => {
     html += '<div style="margin-bottom:12px;">';
     html += `<span style="font-size:16px;">${t.translation || "N/A"}</span> `;
     html += `<span style="font-size:14px; color:#555;">(${t.posTag || "N/A"})</span><br>`;
+
+     html += `
+      <button 
+        class="flash-btn" 
+        data-word="${word}"
+        data-translation="${t.translation}"
+        style="margin-left:8px; padding:4px 8px; font-size:8px; cursor:pointer;">
+        Create Flashcard
+      </button><br>
+    `;
+
     if (t.backTranslations?.length) html += `&nbsp;&nbsp;<strong>Synonyms:</strong> ${t.backTranslations.join(", ")}<br>`;
     if (t.sourceExample && t.targetExample) {
       html += `&nbsp;&nbsp;<strong>Example:</strong><br>`;
@@ -90,6 +101,21 @@ definitionBtn.addEventListener("click", async () => {
   });
 
   definition.innerHTML = html;
+});
+
+definition.addEventListener("click", async (e) => {
+  if (!e.target.classList.contains("flash-btn")) return;
+
+  const word = e.target.dataset.word;
+  const translation = e.target.dataset.translation;
+
+  console.log("Using:", word, translation);
+
+  await sendRuntimeMessage({
+    type: "CREATE_FLASHCARD",
+    word,
+    translation
+  });
 });
 
 // Explain
@@ -107,3 +133,10 @@ explainBtn.addEventListener('click', async () => {
 
   explain.value = result || "Error getting explanation.";
 });
+
+
+
+    // div = document.createElement('div');
+    // div.style.marginBottom = "12px";
+    // div.appendChild(document.createElement(`<span style="font-size:16px;">${t.translation || "N/A"}</span> `));
+    // div.appendChild(document.createElement(`<span style="font-size:14px; color:#555;">(${t.posTag || "N/A"})</span><br>`));
