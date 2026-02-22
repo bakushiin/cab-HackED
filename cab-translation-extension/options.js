@@ -39,12 +39,12 @@ function clearStatusToReady() {
 function applyOptionsToForm(options) {
   const merged = { ...DEFAULT_OPTIONS, ...(options || {}) };
 
-  apiBaseUrlInput.value = merged.apiBaseUrl;
+  // apiBaseUrlInput.value = merged.apiBaseUrl; 
   sourceLangSelect.value = merged.sourceLang;
   targetLangSelect.value = merged.targetLang;
-  explanationStyleSelect.value = merged.explanationStyle;
-  youtubeFallbackCheckbox.checked = Boolean(merged.youtubeFallback);
-  debugModeCheckbox.checked = Boolean(merged.debugMode);
+  // explanationStyleSelect.value = merged.explanationStyle;
+  // youtubeFallbackCheckbox.checked = Boolean(merged.youtubeFallback);
+  // debugModeCheckbox.checked = Boolean(merged.debugMode);
 }
 
 function readOptionsFromForm() {
@@ -52,9 +52,9 @@ function readOptionsFromForm() {
     // apiBaseUrl: apiBaseUrlInput.value.trim(),
     sourceLang: sourceLangSelect.value,
     targetLang: targetLangSelect.value,
-    explanationStyle: explanationStyleSelect.value,
-    youtubeFallback: youtubeFallbackCheckbox.checked,
-    debugMode: debugModeCheckbox.checked
+    // explanationStyle: explanationStyleSelect.value,
+    // youtubeFallback: youtubeFallbackCheckbox.checked,
+    // debugMode: debugModeCheckbox.checked
   };
 }
 
@@ -70,7 +70,7 @@ function validateOptions(options) {
   // }
 
   // source/target cannot be identical if source is explicit (not auto)
-  if (options.sourceLang !== "auto" && options.sourceLang === options.targetLang) {
+  if (options.sourceLang !== "AUTO" && options.sourceLang === options.targetLang) {
     return {
       ok: false,
       message: "Source and target languages cannot be the same when source is explicit."
@@ -142,29 +142,29 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 });
 
-const sourceDropdown = document.getElementById('source-dropdown');
-const targetDropdown = document.getElementById('target-dropdown');
+// const sourceDropdown = document.getElementById('source-dropdown');
+// const targetDropdown = document.getElementById('target-dropdown');
 
-// Load saved language from Chrome storage
-chrome.storage.sync.get(['sourceLanguage'], (data) => {
-  if (data.sourceLanguage) {
-    sourceDropdown.value = data.sourceLanguage;
-  }
-});
+// // Load saved language from Chrome storage
+// chrome.storage.sync.get(['sourceLanguage'], (data) => {
+//   if (data.sourceLanguage) {
+//     sourceDropdown.value = data.sourceLanguage;
+//   }
+// });
 
-// Save selected language
-sourceDropdown.addEventListener('change', () => {
-  chrome.storage.sync.set({ sourceLanguage: sourceDropdown.value });
-});
+// // Save selected language
+// sourceDropdown.addEventListener('change', () => {
+//   chrome.storage.sync.set({ sourceLanguage: sourceDropdown.value });
+// });
 
-// Load saved language from Chrome storage
-chrome.storage.sync.get(['targetLanguage'], (data) => {
-  if (data.targetLanguage) {
-    targetDropdown.value = data.targetLanguage;
-  }
-});
+// // Load saved language from Chrome storage
+// chrome.storage.sync.get(['targetLanguage'], (data) => {
+//   if (data.targetLanguage) {
+//     targetDropdown.value = data.targetLanguage;
+//   }
+// });
 
-// Save selected language
-targetDropdown.addEventListener('change', () => {
-  chrome.storage.sync.set({ targetLanguage: targetDropdown.value });
-});
+// // Save selected language
+// targetDropdown.addEventListener('change', () => {
+//   chrome.storage.sync.set({ targetLanguage: targetDropdown.value });
+// });
