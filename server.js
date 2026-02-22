@@ -26,9 +26,7 @@ app.post("/api/chat", async (req, res) => {
     }
     const body = req.body;
 
-    const response = await openai.responses.create({
-      body
-    });
+    const response = await openai.responses.create(req.body);
 
     res.json(response);
   } catch (error) {
