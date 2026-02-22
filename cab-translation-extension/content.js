@@ -1,5 +1,4 @@
 /* Highlight-selection translation content script. */
-
 let selectionPopup = null;
 let selectedRange = null;
 let selectionUpdateTimer = null;
@@ -13,26 +12,12 @@ function createSelectionPopup() {
 
   selectionPopup = document.createElement("div");
   selectionPopup.id = "cab-translation-selection-popup";
-  selectionPopup.style.position = "fixed";
-  selectionPopup.style.zIndex = "2147483647";
-  selectionPopup.style.display = "none";
-  selectionPopup.style.background = "#ffffff";
-  selectionPopup.style.color = "#ffffff";
-  selectionPopup.style.padding = "8px";
-  selectionPopup.style.borderRadius = "8px";
-  selectionPopup.style.boxShadow = "0 8px 20px rgba(0,0,0,0.25)";
-  selectionPopup.style.fontFamily = "Arial, sans-serif";
-  selectionPopup.style.fontSize = "12px";
+  selectionPopup.className = "cab-translation-selection-popup";
 
   const translateBtn = document.createElement("button");
   translateBtn.type = "button";
   translateBtn.textContent = "Translate";
-  translateBtn.style.border = "0";
-  translateBtn.style.borderRadius = "6px";
-  translateBtn.style.padding = "6px 10px";
-  translateBtn.style.cursor = "pointer";
-  translateBtn.style.background = "#AFBC88";
-  translateBtn.style.color = "#ffffff";
+  translateBtn.className = "cab-translation-button";
 
   selectionPopup.appendChild(translateBtn);
   document.documentElement.appendChild(selectionPopup);
@@ -55,23 +40,63 @@ function createSelectionPopup() {
 
     translateBtn.disabled = true;
     translateBtn.textContent = "Translating...";
-
-    try {
-      const translatedText = await translateTextWithFallback(text);
-
-      if (translatedText) {
-        const replacement = document.createTextNode(translatedText);
-        selectedRange.deleteContents();
-        selectedRange.insertNode(replacement);
-      }
-
-      window.getSelection()?.removeAllRanges();
-    } finally {
-      translateBtn.disabled = false;
-      translateBtn.textContent = "Translate";
-      hideSelectionPopup();
-    }
+    
+    // Placeholder - just show the selected text in the popup for now
+    showPopup(text);
+    
+    translateBtn.disabled = false;
+    translateBtn.textContent = "Translate";
   });
+}
+
+function showPopup(translatedText) {
+  if (!selectedRange) return;
+
+  const popup = document.getElementById("popupbase");
+  if (!popup) {
+    return;
+  }
+
+  popup.innerHTML = `<div>${translatedText || "No translation available"}</div>`;
+  
+  const rect = selectedRange.getBoundingClientRect();
+  let left = rect.left + window.scrollX;
+  let top = rect.bottom + window.scrollY + 10;
+
+  popup.style.left = `${left}px`;
+  popup.style.top = `${top}px`;
+  popup.style.display = "block";
+
+  function onClickOutside(e) {
+    if (popup.contains(e.target)) return;
+    popup.style.display = "none";
+    document.removeEventListener('mousedown', onClickOutside);
+  }
+  document.addEventListener('mousedown', onClickOutside);
+
+  const sidePanelIcon = document.createElement("button");
+  sidePanelIcon.innerHTML = '<img src="' + chrome.runtime.getURL("./cab.png") + '" alt="Panel" />';
+  sidePanelIcon.onclick = (e) => {
+    console.log("Button clicked!");
+    e.stopPropagation();
+    alert("Side panel opened!");
+  }
+  popup.appendChild(sidePanelIcon);
+  
+  
+}
+
+function hideSelectionPopup() {
+  if (selectionPopup) {
+    selectionPopup.style.display = "none";
+  }
+}
+
+if (!document.getElementById("popupbase")) {
+  const popupBase = document.createElement("div");
+  popupBase.id = "popupbase";
+  popupBase.className = "popupbase";
+  document.documentElement.appendChild(popupBase);
 }
 
 function showSelectionPopupForRange(range) {
@@ -92,7 +117,7 @@ function showSelectionPopupForRange(range) {
   const popupHeight = 40;
   const margin = 8;
 
-  let left = rect.left + rect.width / 2 - popupWidth / 2;
+  let left = rect.left + rect.width / 2 + popupWidth / 2;
   left = Math.max(margin, Math.min(left, window.innerWidth - popupWidth - margin));
 
   let top = rect.top - popupHeight - margin;
