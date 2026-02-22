@@ -17,14 +17,6 @@ function setTranslationMode(isEnabled) {
   setStatus(isEnabled ? "Translation is ON." : "Translation is OFF.");
 }
 
-function getActiveTab() {
-  return new Promise((resolve) => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      resolve(tabs?.[0] ?? null);
-    });
-  });
-}
-
 function sendToTab(tabId, message) {
   return new Promise((resolve, reject) => {
     chrome.tabs.sendMessage(tabId, message, (response) => {
@@ -38,7 +30,8 @@ function sendToTab(tabId, message) {
 }
 
 async function refreshState() {
-  const activeTab = await getActiveTab();
+  const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+  const activeTab = tabs?.[0] ?? null;
   if (!activeTab?.id) {
     return;
   }
@@ -52,7 +45,8 @@ async function refreshState() {
 
 if (translateBtn) {
 translateBtn.addEventListener("click", async () => {
-  const activeTab = await getActiveTab();
+  const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+  const activeTab = tabs?.[0] ?? null;
   if (!activeTab?.id) {
     return;
   }
@@ -75,7 +69,8 @@ translateBtn.addEventListener("click", async () => {
 
 if (openPanelBtn) {
 openPanelBtn.addEventListener("click", async () => {
-  const activeTab = await getActiveTab();
+  const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+  const activeTab = tabs?.[0] ?? null;
   if (!activeTab?.windowId || !activeTab?.id) {
     return;
   }
