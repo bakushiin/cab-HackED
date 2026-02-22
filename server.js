@@ -1,6 +1,5 @@
 import express from "express";
 import OpenAI from "openai";
-import cors from "cors";
 import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
 
